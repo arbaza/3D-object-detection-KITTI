@@ -1,0 +1,107 @@
+Workflow of prepare_data.py
+
+To prepare pickle files for cars training following is the command.
+
+command: python kitti/prepare_data.py --car_only --gen_train --gen_val --gen_val_rgb_detection
+
+
+Arguments:
+'--gen_train' = Generate train split frustum data with perturbed GT 2D boxes
+
+'--gen_val' = Generate val split frustum data with GT 2D boxes
+
+'--gen_val_rgb_detection' = Generate val split frustum data with RGB detection 2D boxes
+
+'--car_only' = Only generate cars
+
+'--people_only' = Only generate peds and cycs
+
+**if no arg for car or people only then whitelist all three data(cars,pedestrain,cyclist)
+**as both arg does not make sense if we pass whitelist in Function:extract_frustrum_data()
+
+'--save_dir'= data directory to save data (By default "kitty/data/pickle_data" no need to create dir)
+
+
+Functions:
+
+def extract_frustum_data(idx_filename, split, output_filename,
+                         perturb_box2d=False, augmentX=1, type_whitelist=['Car']):
+#what it does: 
+''' 	Extract point clouds and corresponding annotations in frustums
+        defined generated from 2D bounding boxes
+   	Lidar points and 3d boxes are in *rect camera* coord system
+        (as that in 3d box label files)
+
+    Input:
+        idx_filename: string, each line of the file is a sample ID
+        split: string, either training or testing
+        output_filename: string, the name for output .pickle file
+        viz: bool, whether to visualize extracted data
+        perturb_box2d: bool, whether to perturb the box2d
+            (used for data augmentation in train set)
+        augmentX: scalar, how many augmentations to have for each 2D box.
+        type_whitelist: a list of strings, object types we are interested in.
+    Output:
+        None (will write a .pickle file to the disk)
+'''
+
+
+class kitti_object(object):
+    
+'''Load and parse object data into a usable format.'''
+#intitialize the path variables of the dataset directories.
+#dataset is the object
+
+dataset.get_calibration():
+'''it gives 3X4 matrix of all three variables below:
+R0= 3d XYZ in <label>.txt are in rect camera coord.((R0_rect) as key in cal*.txt file )
+P = 2d box xy are in image2 coord ((P2) as key in cal*.txt file )
+V2C & (inverse)C2V=Points in <lidar>.bin are in Velodyne coord.((Tr_vel_to_cam) as key in cal*.txt file )
+'''
+
+dataset.get_label_objects():
+'''
+works strictly for training data only.
+it calls Object3D class in kitti_utils.
+
+Label data information:
+ type = data[0]  # 'Car', 'Pedestrian', ...
+ truncation = data[1]  # truncated pixel ratio [0..1]
+ occlusion = int(data[2])  # 0=visible, 1=partly occluded, 2=fully occluded, 3=unknown
+ alpha = data[3]  # object observation angle [-pi..pi]
+
+# extract 2d bounding box in 0-based coordinates
+ xmin = data[4]  # left
+ ymin = data[5]  # top
+ xmax = data[6]  # right
+ ymax = data[7]  # bottom
+ box2d = np.array([xmin, ymin, xmax,ymax])
+
+# extract 3d bounding box information
+ h = data[8]  # box height
+ w = data[9]  # box width
+ l = data[10]  # box length (in meters)
+ t = (data[11], data[12], data[13])  # location (x,y,z) in camera coord.
+ ry = data[14]  # yaw angle (around Y-axis in camera coordinates) [-pi..pi]
+
+score = data[15] # optional by default score=1
+
+'''
+
+dataset.get_lidar():
+'''
+scan the veto file wit the default numpy command i.e np.fromfile() and reshape output to (-1 X 4)
+'''
+ 
+caliber.calib.project_velo_to_rect():
+'''
+return pc_rect which is give dot product of R0(calibration file) & pc_velo (dataset.get_lidar() points take -1X3).
+
+After that in code 4th column is direct copy from pc_velo to pc_rect
+'''
+
+get_lidar_in_image_fov():
+'''
+Convert 3D(pc_velo with more calib information) to 2D image 
+
+'''

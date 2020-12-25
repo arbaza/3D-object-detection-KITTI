@@ -1,0 +1,12 @@
+LABELS:
+https://s3.eu-central-1.amazonaws.com/avg-kitti/data_object_label_2.zip
+
+LIDAR/Velodyne DATA:
+ https://s3.eu-central-1.amazonaws.com/avg-kitti/data_object_velodyne.zip
+
+2-D Image DATA:
+ https://s3.eu-central-1.amazonaws.com/avg-kitti/data_object_image_2.zip
+
+
+Calibration DATA:
+https://s3.eu-central-1.amazonaws.com/avg-kitti/data_object_calib.zip
